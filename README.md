@@ -145,7 +145,7 @@ If you fail to satisfy these concrete requirements at any time, you will get fat
 
 Now that we have examined the contents of a topology file, we can continue building our system.
 
-##Generate a box and add water (solvatation)
+## Generate a box and add water (solvatation)
 
 Now that you are familiar with the contents of the GROMACS topology, it is time to continue building our system. In this example, we are going to be simulating a simple aqueous system. It is possible to simulate proteins and other molecules in different solvents, provided that good parameters are available for all species involved.
 
@@ -177,7 +177,7 @@ SOL             127719
 
 What solvate has done is keep track of how many water molecules it has added, which it then writes to your topology to reflect the changes that have been made. Note that if you use any other (non-water) solvent, solvate will not make these changes to your topology! Its compatibility with updating water molecules is hard-coded.
 
-##Add ions
+## Add ions
 
 `gmx grompp -f ions.mdp -c ZIKA_solv.gro -p topol.top -o ions.tpr
 `
