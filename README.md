@@ -145,6 +145,8 @@ If you fail to satisfy these concrete requirements at any time, you will get fat
 
 Now that we have examined the contents of a topology file, we can continue building our system.
 
+##Generate a box and add water (solvatation)
+
 Now that you are familiar with the contents of the GROMACS topology, it is time to continue building our system. In this example, we are going to be simulating a simple aqueous system. It is possible to simulate proteins and other molecules in different solvents, provided that good parameters are available for all species involved.
 
 There are two steps to defining the box and filling it with solvent:
@@ -153,14 +155,47 @@ Fill the box with water using the solvate module (formerly called genbox).
 You are now presented with a choice as to how to treat the unit cell. For the purpose of this tutorial, we will use a simple triclinic box as the unit cell. As you become more comfortable with periodic boundary conditions and box types, I highly recommend the rhombic dodecahedron, as its volume is ~71% of the cubic box of the same periodic distance, thus saving on the number of water molecules that need to be added to solvate the RNA molecule.
 
 Let's define the box using editconf:
-`
+
+```
 gmx editconf -f ZIKA_processed.gro -o ZIKA_newbox.gro -c -d 2.5 -bt triclinic
+```
+
+The above command centers the protein in the box (-c), and places it at least 2.5 nm from the box edge (-d 2.5). The box type is defined as a cube (-bt triclinic). The distance to the edge of the box is an important parameter. Since we will be using periodic boundary conditions, we must satisfy the minimum image convention. That is, a protein should never see its periodic image, otherwise the forces calculated will be spurious. Specifying a solute-box distance of 2.5 nm will mean that there are at least 2.0 nm between any two periodic images of the molecule. This distance will be sufficient for just about any cutoff scheme commonly used in simulations.
+
+Now that we have defined a box, we can fill it with solvent (water). Solvation is accomplished using solvate:
+```
+gmx solvate -cp ZIKA_newbox.gro -cs spc216.gro -o ZIKA_solv.gro -p topol.top
+```
+The configuration of the RNA molecule (-cp) is contained in the output of the previous editconf step, and the configuration of the solvent (-cs) is part of the standard GROMACS installation. We are using spc216.gro, which is a generic equilibrated 3-point solvent model. You can use spc216.gro as the solvent configuration for SPC, SPC/E, or TIP3P water, since they are all three-point water models. The output is called ZIKA_solv.gro, and we tell solvate the name of the topology file (topol.top) so it can be modified. Note the changes to the [ molecules ] directive of topol.top:
+
+```
+[ molecules ]
+; Compound        #mols
+RNA_chain_A         1
+SOL             127719
+```
+
+What solvate has done is keep track of how many water molecules it has added, which it then writes to your topology to reflect the changes that have been made. Note that if you use any other (non-water) solvent, solvate will not make these changes to your topology! Its compatibility with updating water molecules is hard-coded.
+
+##Add ions
+
+`gmx grompp -f ions.mdp -c ZIKA_solv.gro -p topol.top -o ions.tpr
 `
 
+We now have a solvated system that contains a charged protein. The output of pdb2gmx told us that the protein has a net charge of +8e (based on its amino acid composition). If you missed this information in the pdb2gmx output, look at the last line of your [ atoms ] directive in topol.top; it should read (in part) "qtot 8." Since life does not exist at a net charge, we must add ions to our system.
 
+The tool for adding ions within GROMACS is called genion. What genion does is read through the topology and replace water molecules with the ions that the user specifies. The input is called a run input file, which has an extension of .tpr; this file is produced by the GROMACS grompp module (GROMACS pre-processor), which will also be used later when we run our first simulation. What grompp does is process the coordinate file and topology (which describes the molecules) to generate an atomic-level input (.tpr). The .tpr file contains all the parameters for all of the atoms in the system.
 
+To produce a .tpr file with grompp, we will need an additional input file, with the extension .mdp (molecular dynamics parameter file); grompp will assemble the parameters specified in the .mdp file with the coordinates and topology information to generate a .tpr file.
 
+An .mdp file is normally used to run energy minimization or an MD simulation, but in this case is simply used to generate an atomic description of the system. An example .mdp file (the one we will use) can be downloaded here.
 
+In reality, the .mdp file used at this step can contain any legitimate combination of parameters. I typically use an energy-minimization script, because they are very basic and do not involve any complicated parameter combinations. Please note that the files provided with this tutorial are intended only for use with the AMBER03 force field. Settings, particularly nonbonded interaction settings, will be different for other force fields.
 
+Assemble your .tpr file with the following:
+
+`gmx grompp -f minim.mdp -c ZIKA_solv_ions.gro -p topol.top -o em.tpr`
+
+Now we have an atomic-level description of our system in the binary file ions.tpr. We will pass this file to genion:
 
 
