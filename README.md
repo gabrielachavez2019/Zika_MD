@@ -2,10 +2,9 @@
 
 All the files you need to start MD on 3'end RNA of Zika Virus
 
-This example will guide newbies through the process of setting up a simulation system containing an RNA molecule (3'end Zika virus genome
-) in a box of water, with ions. Each step will contain an explanation of input and output, using typical settings for general use.
+This example will guide newbies through the process of setting up a simulation system containing an RNA molecule (3'end Zika virus genome) in a box of water, with ions. Each step will contain an explanation of input and output, using typical settings for general use.
 
-This tutorial assumes you are using a GROMACS version in the 2018.1
+This tutorial assumes you are using a [GROMACS](http://www.gromacs.org/) version in the 2018.1
 
 ## Create topology
 
@@ -161,6 +160,8 @@ gmx editconf -f ZIKA_processed.gro -o ZIKA_newbox.gro -c -d 2.5 -bt triclinic
 ```
 
 The above command centers the protein in the box (-c), and places it at least 2.5 nm from the box edge (-d 2.5). The box type is defined as a cube (-bt triclinic). The distance to the edge of the box is an important parameter. Since we will be using periodic boundary conditions, we must satisfy the minimum image convention. That is, a protein should never see its periodic image, otherwise the forces calculated will be spurious. Specifying a solute-box distance of 2.5 nm will mean that there are at least 2.0 nm between any two periodic images of the molecule. This distance will be sufficient for just about any cutoff scheme commonly used in simulations.
+
+![](Zika_box.png)
 
 Now that we have defined a box, we can fill it with solvent (water). Solvation is accomplished using solvate:
 ```
