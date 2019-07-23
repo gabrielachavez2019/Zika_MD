@@ -25,6 +25,7 @@ Execute pdb2gmx by issuing the following command
 `
 gmx pdb2gmx -f ZIKA.pdb -o ZIKA_processed.gro -water spce -ignh
 `
+
 The structure will be processed by pdb2gmx, and you will be prompted to choose a force field:
 
 ```
