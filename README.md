@@ -202,7 +202,7 @@ Now we have an atomic-level description of our system in the binary file ions.tp
 
 `gmx genion -s ions.tpr -o ZIKA_solv_ions.gro -p topol.top -pname NA -nname CL -neutral`
 
-Choose group 13 "SOL" for embedding ions. You do not want to replace parts of your RNA with ions.
+Choose group 3 "SOL" for embedding ions. You do not want to replace parts of your RNA with ions.
 
 In the genion command, we provide the structure/state file (-s) as input, generate a .gro file as output (-o), process the topology (-p) to reflect the removal of water molecules and addition of ions, define positive and negative ion names (-pname and -nname, respectively), and tell genion to add only the ions necessary to neutralize the net charge on the protein by adding the correct number of negative ions (-neutral, which in this case will add 8 Cl- ions to offset the +8 charge on the protein). You can also use genion to add a specified concentration of ions in addition to simply neutralizing the system by specifying the -neutral and -conc options in conjunction. Refer to the genion man page for information on how to use these options.
 
