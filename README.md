@@ -217,7 +217,7 @@ The solvated, electroneutral system is now assembled. Before we can begin dynami
 
 The process for EM is much like the addition of ions. We are once again going to use grompp to assemble the structure, topology, and simulation parameters into a binary input file (.tpr), but this time, instead of passing the .tpr to genion, we will run the energy minimization through the GROMACS MD engine, mdrun.
 
-Assemble the binary input using grompp using **em.tpr** input parameter file:
+Assemble the binary input using grompp using **em.tpr** input parameter file with nsteps = 50000:
 
 `gmx grompp -f minim.mdp -c ZIKA_solv_ions.gro -p topol.top -o em.tpr`
 
@@ -238,7 +238,7 @@ There are two very important factors to evaluate to determine if EM was successf
 
 Let's do a bit of analysis. The em.edr file contains all of the energy terms that GROMACS collects during EM. You can analyze any .edr file using the GROMACS energy module:
 
-gmx energy -f em.edr -o potential.xvg
+`gmx energy -f em.edr -o potential.xvg`
 
 At the prompt, type "10 0" to select Potential (10); zero (0) terminates input. You will be shown the average of Epot, and a file called "potential.xvg" will be written. To plot this data, you will need the Xmgrace plotting tool. The resulting plot should look something like this, demonstrating the nice, steady convergence of Epot:
 
