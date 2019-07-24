@@ -71,7 +71,7 @@ Please note that we are using the option:
 
 You have now generated three new files: ZIKA_processed.gro, topol.top, and posre.itp. ZIKA_processed.gro is a GROMACS-formatted structure file that contains all the atoms defined within the force field. The topol.top file is the system topology (more on this in a minute). The posre.itp file contains information used to restrain the positions of heavy atoms (more on this later).
 
-Let's look at what is in the output topology (topol.top). Inspect its contents using vi or nano, don't chage anythig!. After several comment lines (preceded by ;), you will find the following:
+Let's look at what is in the output topology (topol.top). Inspect its contents using vi or nano, don't change anythig!. After several comment lines (preceded by ;), you will find the following:
 
 `
 #include "amber03.ff/forcefield.itp"
