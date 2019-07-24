@@ -1,4 +1,5 @@
 # GROMACS tutorial for RNA molecular dynamics simulation
+![](https://img.shields.io/twitter/url/http/@gabvet.svg?label=%40gabvet&style=social)
 
 All the files you need to start MD on 3'end RNA of Zika Virus
 
@@ -218,7 +219,7 @@ The solvated, electroneutral system is now assembled. Before we can begin dynami
 
 The process for EM is much like the addition of ions. We are once again going to use grompp to assemble the structure, topology, and simulation parameters into a binary input file (.tpr), but this time, instead of passing the .tpr to genion, we will run the energy minimization through the GROMACS MD engine, mdrun.
 
-Assemble the binary input using grompp using **em.tpr** input parameter file with nsteps = 50000:
+Assemble the binary input using grompp using **em.tpr** input parameter file with nsteps = 5000:
 
 `gmx grompp -f minim.mdp -c ZIKA_solv_ions.gro -p topol.top -o em.tpr`
 
@@ -241,10 +242,46 @@ Let's do a bit of analysis. The em.edr file contains all of the energy terms tha
 
 `gmx energy -f em.edr -o potential.xvg`
 
-At the prompt, type "10 0" to select Potential (10); zero (0) terminates input. You will be shown the average of Epot, and a file called "potential.xvg" will be written. To plot this data, you will need the Xmgrace plotting tool. The resulting plot should look something like this, demonstrating the nice, steady convergence of Epot:
+At the prompt, type "10 0" to select Potential (10); zero (0) terminates input. You will be shown the average of Epot, and a file called "potential.xvg" will be written. To plot this data, you will need the Grace plotting tool. The resulting plot should look something like this, demonstrating the nice, steady convergence of E_pot:
+
+`xmgrace potential.xvg`
+
+![](Energy_Minimization_Zika.png)
 
 Now that our system is at an energy minimum, we can begin real dynamics.
 
-## Equilibration
+## Equilibration in Temperature
+
+EM ensured that we have a reasonable starting structure, in terms of geometry and solvent orientation. To begin real dynamics, we must equilibrate the solvent and ions around the protein. If we were to attempt unrestrained dynamics at this point, the system may collapse. The reason is that the solvent is mostly optimized within itself, and not necessarily with the solute. It needs to be brought to the temperature we wish to simulate and establish the proper orientation about the solute (the RNA). After we arrive at the correct temperature (based on kinetic energies), we will apply pressure to the system until it reaches the proper density.
+
+Remember that **posre.itp** file that pdb2gmx generated a long time ago? We're going to use it now! The purpose of **posre.itp** is to apply a position restraining force on the heavy atoms of the protein (anything that is not a hydrogen). Movement is permitted, but only after overcoming a substantial energy penalty. The utility of position restraints is that they allow us to equilibrate our solvent around our protein, without the added variable of structural changes in the RNA. The origin of the position restraints (the coordinates at which the restraint potential is zero) is provided via a coordinate file passed to the -r option of grompp.
+
+Equilibration is often conducted in two phases. The first phase is conducted under an NVT ensemble (constant Number of particles, Volume, and Temperature). This ensemble is also referred to as "isothermal-isochoric" or "canonical." The timeframe for such a procedure is dependent upon the contents of the system, but in NVT, the temperature of the system should reach a plateau at the desired value. If the temperature has not yet stabilized, additional time will be required. Typically, 50-100 ps should suffice, and we will conduct a 100-ps NVT equilibration for this exercise. Depending on your machine, this may take a while (just under an hour if run in parallel on 16 cores or so).
+
+We will call grompp and mdrun just as we did at the EM step:
+
+```
+gmx grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr
+gmx mdrun -deffnm nvt
+```
+
+A full explanation of the parameters used can be found in the ![GROMACS](www.gromacs.org) manual, in addition to the comments provided. Take note of a few parameters in the .mdp file:
+
+- gen_vel = yes: Initiates velocity generation. Using different random seeds (gen_seed) gives different initial velocities, and thus multiple (different) simulations can be conducted from the same starting structure.
+- tcoupl = V-rescale: The velocity rescaling thermostat is an improvement upon the Berendsen weak coupling method, which did not reproduce a correct kinetic ensemble.
+- pcoupl = no: Pressure coupling is not applied.
+
+Let's analyze the temperature progression, again using energy:
+
+`gmx energy -f nvt.edr -o temperature.xvg`
+
+Type "16 0" at the prompt to select the temperature of the system and exit. The resulting plot should look something like the following:
+
+![](Temperature_Zika.png)
+
+From the plot, it is clear that the temperature of the system quickly reaches the target value (300 K), and remains stable over the remainder of the equilibration. For this system, a shorter equilibration period (on the order of 50 ps) may have been adequate.
+
+## Equilibration in Pressure
+
 
 
