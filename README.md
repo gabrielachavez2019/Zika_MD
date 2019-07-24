@@ -247,6 +247,7 @@ At the prompt, type "10 0" to select Potential (10); zero (0) terminates input. 
 `xmgrace potential.xvg`
 
 ![](Energy_Minimization_Zika.png)
+
 Now that our system is at an energy minimum, we can begin real dynamics.
 
 ## Equilibration in Temperature
