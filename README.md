@@ -247,7 +247,6 @@ At the prompt, type "10 0" to select Potential (10); zero (0) terminates input. 
 `xmgrace potential.xvg`
 
 ![](Energy_Minimization_Zika.png)
-
 Now that our system is at an energy minimum, we can begin real dynamics.
 
 ## Equilibration in Temperature
@@ -265,7 +264,7 @@ gmx grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr
 gmx mdrun -deffnm nvt
 ```
 
-A full explanation of the parameters used can be found in the ![GROMACS](www.gromacs.org) manual, in addition to the comments provided. Take note of a few parameters in the .mdp file:
+A full explanation of the parameters used can be found in the ![GROMACS](http://www.gromacs.org) manual, in addition to the comments provided. Take note of a few parameters in the .mdp file:
 
 - gen_vel = yes: Initiates velocity generation. Using different random seeds (gen_seed) gives different initial velocities, and thus multiple (different) simulations can be conducted from the same starting structure.
 - tcoupl = V-rescale: The velocity rescaling thermostat is an improvement upon the Berendsen weak coupling method, which did not reproduce a correct kinetic ensemble.
@@ -275,13 +274,100 @@ Let's analyze the temperature progression, again using energy:
 
 `gmx energy -f nvt.edr -o temperature.xvg`
 
-Type "16 0" at the prompt to select the temperature of the system and exit. The resulting plot should look something like the following:
+Type "16 0" at the prompt to select the temperature of the system and exit. The resulting plot should look something like the following after `xmgrace temperature.xvg`
 
 ![](Temperature_Zika.png)
 
 From the plot, it is clear that the temperature of the system quickly reaches the target value (300 K), and remains stable over the remainder of the equilibration. For this system, a shorter equilibration period (on the order of 50 ps) may have been adequate.
 
 ## Equilibration in Pressure
+
+The previous step, *NVT* equilibration, stabilized the temperature of the system. Prior to data collection, we must also stabilize the pressure (and thus also the density) of the system. Equilibration of pressure is conducted under an NPT ensemble, wherein the Number of particles, Pressure, and Temperature are all constant. The ensemble is also called the "isothermal-isobaric" ensemble, and most closely resembles experimental conditions.
+
+The npt.mdp it is not drastically different from the parameter file used for NVT equilibration. Note the addition of the pressure coupling section, using the Parrinello-Rahman barostat.
+
+A few other changes:
+
+continuation = yes: We are continuing the simulation from the NVT equilibration phase
+gen_vel = no: Velocities are read from the trajectory (see below)
+We will call grompp and mdrun just as we did for NVT equilibration. Note that we are now including the -t flag to include the checkpoint file from the NVT equilibration; this file contains all the necessary state variables to continue our simulation. To conserve the velocities produced during NVT, we must include this file. The coordinate file (-c) is the final output of the NVT simulation.
+
+```
+gmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -o npt.tpr
+gmx mdrun -deffnm npt
+```
+
+Let's analyze the pressure progression, again using energy:
+
+`gmx energy -f npt.edr -o pressure.xvg`
+
+Type "18 0" at the prompt to select the pressure of the system and exit. The resulting plot should look something like the following:
+
+![](Pressure_Zika.png)
+
+The pressure value fluctuates widely over the course of the 100-ps equilibration phase, but this behavior is not unexpected. The running average of these data are plotted as the red line in the plot. Over the course of the equilibration, the average value of the pressure is 7.5 ± 160.5 bar. Note that the reference pressure was set to 1 bar, so is this outcome acceptable? Pressure is a quantity that fluctuates widely over the course of an MD simulation, as is clear from the large root-mean-square fluctuation (160.5 bar), so statistically speaking, one cannot distinguish a difference between the obtained average (7.5 ± 160.5 bar) and the target/reference value (1 bar).
+
+Let's take a look at density as well, this time using energy and entering "24 0" at the prompt.
+
+`gmx energy -f npt.edr -o density.xvg`
+
+As with the pressure, the running average of the density is also plotted in red. The average value over the course of 100 ps is 1019 ± 3 kg m-3, close to the experimental value of 1000 kg m-3 and the expected density of the SPC/E model of 1008 kg m-3. The parameters for the SPC/E water model closely replicate experimental values for water. The density values are very stable over time, indicating that the system is well-equilibrated now with respect to pressure and density.
+
+if your density values do not match. Pressure-related terms are slow to converge, and thus you may have to run NPT equilibration slightly longer.
+
+## Molecular Dynamics
+
+Upon completion of the two equilibration phases, the system is now well-equilibrated at the desired temperature and pressure. We are now ready to release the position restraints and run production MD for data collection. The process is just like we have seen before, as we will make use of the checkpoint file (which in this case now contains preserve pressure coupling information) to grompp. We will run a 1-ns MD simulation, the script for which can be found here.
+
+`gmx grompp -f md.mdp -c npt.gro -t npt.cpt -p topol.top -o md_0_1.tpr`
+
+grompp will print an estimate for PME load, which will dictate how many processors should be dedicated to the PME calculation, and how many for the PP calculations. Refer to the GROMACS 4 publication and the manual for details.
+
+Estimate for the relative computational load of the PME mesh part: 0.22
+For a cubic box, the optimal setup will have a PME load of 0.25 (3:1 PP:PME - we're very close to optimal!); for a dodecahedral box, the optimal PME load is 0.33 (2:1 PP:PME). When executing mdrun, the program should automatically determine the best number of processors to assign for the PP and PME calculations. Thus, make sure you indicate an appropriate number of threads/cores for your calculation (the value of -nt X), so that you can get the best performance.
+
+Now, execute mdrun:
+
+`gmx mdrun -deffnm md_0_1`
+
+In GROMACS 2018, the PME calculations can be offloaded to graphical processing units (GPU), which speeds up the simulation substantially. Using a Titan Xp GPU, this system can be simulated at an astounding 295 ns/day!
+
+## Analysis
+
+Now that we have simulated our RNA, we should run some analysis on the system. What types of data are important? This is an important question to ask before running the simulation, so you should have some ideas about the types of data you will want to collect in your own systems. For this tutorial, a few basic tools will be introduced.
+
+The first is trjconv, which is used as a post-processing tool to strip out coordinates, correct for periodicity, or manually alter the trajectory (time units, frame frequency, etc). For this exercise, we will use trjconv to account for any periodicity in the system. The protein will diffuse through the unit cell, and may appear "broken" or may "jump" across to the other side of the box. To account for such actions, issue the following:
+
+`gmx trjconv -s md_0_1.tpr -f md_0_1.xtc -o md_0_1_noPBC.xtc -pbc mol -center`
+
+Select 1 ("RNA") as the group to be centered and 0 ("System") for output. We will conduct all our analyses on this "corrected" trajectory. Let's look at structural stability first. 
+
+### RMSD calculations
+GROMACS has a built-in utility for RMSD calculations called rms. To use rms, issue this command:
+
+`gmx rms -s md_0_1.tpr -f md_0_1_noPBC.xtc -o rmsd.xvg -tu ns`
+
+Choose 4 ("Backbone") for both the least-squares fit and the group for RMSD calculation. The -tu flag will output the results in terms of ns, even though the trajectory was written in ps. This is done for clarity of the output (especially if you have a long simulation - 1e+05 ps does not look as nice as 100 ns). The output plot will show the RMSD relative to the structure present in the minimized, equilibrated system:
+
+If we wish to calculate RMSD relative to the crystal structure, we could issue the following:
+
+`gmx rms -s em.tpr -f md_0_1_noPBC.xtc -o rmsd_xtal.xvg -tu ns`
+
+Plotted together, results look something like:
+
+
+### Radius of gyration
+The radius of gyration of an RNA molecule is a measure of its compactness. If the RNA is stably folded, it will likely maintain a relatively steady value of Rg. If the RNA unfolds, its Rg will change over time. Let's analyze the radius of gyration for Zika in our simulation:
+
+`gmx gyrate -s md_0_1.tpr -f md_0_1_noPBC.xtc -o gyrate.xvg`
+
+Choose group 1 (RNA) for analysis.
+
+We can see from the reasonably invariant Rg values that the RNA remains very unestable, does not remain folded in the same way ovet the time form over the course of 1 ns at 300 K. This result is not unexpected, but illustrates an advanced capacity of GROMACS analysis that comes built-in.
+
+Happy simulating!
+
+
 
 
 
