@@ -264,7 +264,7 @@ gmx grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr
 gmx mdrun -deffnm nvt
 ```
 
-A full explanation of the parameters used can be found in the ![GROMACS](http://www.gromacs.org) manual, in addition to the comments provided. Take note of a few parameters in the .mdp file:
+A full explanation of the parameters used can be found in the [GROMACS](http://www.gromacs.org) manual, in addition to the comments provided. Take note of a few parameters in the .mdp file:
 
 - gen_vel = yes: Initiates velocity generation. Using different random seeds (gen_seed) gives different initial velocities, and thus multiple (different) simulations can be conducted from the same starting structure.
 - tcoupl = V-rescale: The velocity rescaling thermostat is an improvement upon the Berendsen weak coupling method, which did not reproduce a correct kinetic ensemble.
