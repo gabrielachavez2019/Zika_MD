@@ -1,7 +1,7 @@
 # GROMACS tutorial for RNA molecular dynamics simulation
 ![](https://img.shields.io/twitter/url/http/@gabvet.svg?label=%40gabvet&style=social)
 
-All the files you need to start MD on 3'end RNA of Zika Virus
+This folder contains all the files you need to start MD on 3'end RNA of Zika Virus, except the ZIKA.pdb
 
 This example will guide newbies through the process of setting up a simulation system containing an RNA molecule (3'end Zika virus genome) in a box of water, with ions. Each step will contain an explanation of input and output, using typical settings for general use.
 
@@ -9,11 +9,11 @@ This tutorial assumes you are using a [GROMACS](http://www.gromacs.org/) version
 
 ## Requeriments
 
-- install ThinLinc Client
-- connect to earth.auburn.edu
-- use your ID Auburn credentials
+- Install ThinLinc Client
+- Connect to earth.auburn.edu
+- Use your ID Auburn credentials
 - Open a terminal
-- Fisrt time you might need to source `source /automnt/gromacs/default/bin/GMXRC`
+- Fisrt time you might need to source gromacs  `source /automnt/gromacs/default/bin/GMXRC`
 - Get the ZIKA.pdb file
 
 ## Create topology
