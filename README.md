@@ -340,7 +340,7 @@ Now, execute mdrun:
 
 `gmx mdrun -deffnm md_0_1`
 
-In GROMACS 2018, the PME calculations can be offloaded to graphical processing units (GPU), which speeds up the simulation substantially. Using a Titan Xp GPU, this system can be simulated at an astounding 295 ns/day!
+In GROMACS 2018, the PME calculations can be offloaded to graphical processing units (GPU), which speeds up the simulation substantially.
 
 ## Analysis
 
