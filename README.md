@@ -7,6 +7,15 @@ This example will guide newbies through the process of setting up a simulation s
 
 This tutorial assumes you are using a [GROMACS](http://www.gromacs.org/) version in the 2018.1
 
+## Requeriments
+
+- install ThinLinc Client
+- connect to earth.auburn.edu
+- use your ID Auburn credentials
+- Open a terminal
+- Fisrt time you might need to source `source /automnt/gromacs/default/bin/GMXRC`
+- Get the ZIKA.pdb file
+
 ## Create topology
 
 Verified that all the necessary atoms are present. Always check your pdb file for MISSING entries, as these entries indicate either atoms or whole residues that are not present in the crystal structure. Terminal regions may be absent, and may not present a problem for dynamics. Incomplete internal sequences or nucleic residues that have missing atoms will cause pdb2gmx to fail. These missing atoms/residues must be modeled in using other software packages: rosetta, robetta or molprobity. 
