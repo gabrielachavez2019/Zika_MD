@@ -10,11 +10,13 @@ This tutorial assumes you are using a [GROMACS](http://www.gromacs.org/) version
 ## Requeriments
 
 - Install ThinLinc Client
-- Connect to earth.auburn.edu
+- Connect to venus.auburn.edu
 - Use your ID Auburn credentials
 - Open a terminal
+- Make a work directory ie `mkdir Zika_MD` 
 - Fisrt time you might need to source gromacs  `source /automnt/gromacs/default/bin/GMXRC`
-- Get the ZIKA.pdb file
+- Get the ZIKA.pdb file ie `scp`
+- Get all the files cloning this directory using github or downloading it as a zip file.
 
 ## Create topology
 
@@ -377,7 +379,7 @@ We can see from the reasonably invariant Rg values that the RNA remains very une
 
 Happy simulating!
 
-
+![](Zika_Toomer.png)
 
 
 
