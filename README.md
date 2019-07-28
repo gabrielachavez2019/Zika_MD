@@ -384,8 +384,7 @@ Happy simulating!
 # Acknowledgments
 
 ## Material
-This exercise was inspired by, and borrowed heavily from, the Lysozyme in Water [Gromacs_tutorial] (http://www.mdtutorials.com/gmx/lysozyme/index.html)
-can be found at <http://www.mdtutorials.com/gmx/lysozyme/index.html>.
+This exercise was inspired by, and borrowed heavily from, the Lysozyme in Water [Gromacs tutorial](http://www.mdtutorials.com/gmx/lysozyme/index.html) can be found at <http://www.mdtutorials.com/gmx/lysozyme/index.html>.
 
 ## Support
 This work was made possible by funding provided to [Joanna Sztuba-Solinska](https://jsztuba.wixsite.com/sztubasolinska)
