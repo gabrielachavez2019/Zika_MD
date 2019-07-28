@@ -16,7 +16,7 @@ This tutorial assumes you are using a [GROMACS](http://www.gromacs.org/) version
 - Make a work directory ie `mkdir Zika_MD` 
 - Fisrt time you might need to source gromacs  `source /automnt/gromacs/default/bin/GMXRC`
 - Get the ZIKA.pdb file ie `scp`
-- Get all the files cloning this directory using github or downloading it as a zip file.
+- Get all the files cloning this directory using [git](https://github.com/joaks1/au-bootcamp-git-intro) or downloading it as a zip file.
 
 ## Create topology
 
