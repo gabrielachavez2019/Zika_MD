@@ -398,12 +398,10 @@ This work was made possible by funding provided to [Joanna Sztuba-Solinska](http
 # Other notes:
 
 ```
+cd /automnt/gromacs/default/bin/
 echo "" >> ~/.bashrc 
-
 echo "export PATH=\"\$PATH:$(pwd)\"" >> ~/.bashrc 
-
 source ~/.bashrc 
-
 cd
 ```
 
