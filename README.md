@@ -375,6 +375,7 @@ The radius of gyration of an RNA molecule is a measure of its compactness. If th
 `gmx gyrate -s md_0_1.tpr -f md_0_1_noPBC.xtc -o gyrate.xvg`
 
 Choose group 1 (RNA) for analysis.
+![](Gyration.png)
 
 We can see from the reasonably invariant Rg values that the RNA remains very unestable, does not remain folded in the same way ovet the time form over the course of 1 ns at 300 K. This result is not unexpected, but illustrates an advanced capacity of GROMACS analysis that comes built-in.
 
