@@ -367,7 +367,7 @@ If we wish to calculate RMSD relative to the crystal structure, we could issue t
 
 Results look something like:
 
-
+![](RMDS_100ns.png)
 
 ### Radius of gyration
 The radius of gyration of an RNA molecule is a measure of its compactness. If the RNA is stably folded, it will likely maintain a relatively steady value of Rg. If the RNA unfolds, its Rg will change over time. Let's analyze the radius of gyration for Zika in our simulation:
